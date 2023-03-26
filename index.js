@@ -4,7 +4,6 @@ ctx = canvas.getContext("2d");
 //Canvas
 canvas.width = 1000;
 canvas.height = 600;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 //Arena
 const grav = 0.4;
@@ -21,6 +20,7 @@ class Sprite {
     movespeed = 2,
     offset = { x: 0, y: 0 },
     controls,
+    name,
   }) {
     //Passing object {a, b...} to the constructor so that we can pass any argument in any order
     this.position = position;
@@ -37,6 +37,7 @@ class Sprite {
       offset,
     };
     this.isAttacking = false;
+    this.damage = 5;
     this.cooldown = true;
     this.controls = controls;
     this.action = {
@@ -48,6 +49,8 @@ class Sprite {
       attack2: { pressed: false },
       attack3: { pressed: false },
     };
+    this.name = name;
+    this.health = 100;
   }
   draw() {
     //character
@@ -63,18 +66,19 @@ class Sprite {
         this.attackBox.width,
         this.attackBox.height
       );
-      console.log(this.attackBox.offset.y);
     }
   }
   update() {
     this.draw();
+    if (this.position.y + this.height < floorHeight) this.velocity.y += grav;
 
-    if (this.position.y + this.height >= floorHeight) {
-      this.velocity.y = 0;
-    } else this.velocity.y += grav;
     this.control();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
+    if (this.position.y + this.height >= floorHeight) {
+      this.velocity.y = 0;
+      this.position.y = floorHeight - this.height;
+    }
   }
   control() {
     this.velocity.x = 0;
@@ -100,7 +104,10 @@ class Sprite {
       this.attack();
       this.attackBox.position = {
         x: this.position.x + this.attackBox.offset.x,
-        y: this.position.y + this.attackBox.offset.y,
+        y:
+          findSpriteMid(this, "y") +
+          this.attackBox.offset.y -
+          this.attackBox.height / 2,
       };
     }
   }
@@ -114,6 +121,7 @@ class Sprite {
       this.cooldown = true;
     }, 1000);
   }
+
   setKeys() {
     window.addEventListener("keydown", (event) => {
       switch (event.key) {
@@ -159,17 +167,25 @@ const player = new Sprite({
   velocity: { x: 0, y: 0 },
   isPlayer: true,
   color: "red",
-  offset: { x: 0, y: 20 },
+  offset: { x: 0, y: 0 },
   controls: p1Controls,
+  name: "player",
 });
 
 const enemy = new Sprite({
   position: { x: 800, y: 0 },
   velocity: { x: 0, y: 0 },
   color: "blue",
-  offset: { x: -25, y: 20 },
+  offset: { x: -25, y: 0 },
   controls: p2Controls,
+  name: "enemy",
 });
+
+function findSpriteMid(obj, axis) {
+  let xy;
+  axis == "x" ? (xy = "width") : (xy = "height");
+  return obj.position[axis] + obj[xy] / 2;
+}
 
 function checkCollision({ attacker, target }) {
   return (
@@ -181,28 +197,40 @@ function checkCollision({ attacker, target }) {
     attacker.attackBox.position.y <= target.position.y + target.height
   );
 }
+function damage(attacker, target) {
+  target.health -= attacker.damage;
+
+  document.querySelector(
+    `#${target.name}Health`
+  ).style.width = `${target.health}%`;
+}
+
 player.setKeys();
 enemy.setKeys();
 //Animate Game Loop
 function animate() {
   window.requestAnimationFrame(animate);
+  //background
   ctx.fillStyle = "green";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "brown";
-  ctx.fillRect(0, floorHeight, canvas.width, canvas.height);
+  ctx.fillRect(0, floorHeight - 50, canvas.width, canvas.height);
+  //input
   player.update();
   enemy.update();
-  //collisions
+
   if (
     player.isAttacking &&
     checkCollision({ attacker: player, target: enemy })
   ) {
+    damage(player, enemy);
     player.isAttacking = false;
   }
   if (
     enemy.isAttacking &&
     checkCollision({ attacker: enemy, target: player })
   ) {
+    damage(enemy, player);
     enemy.isAttacking = false;
   }
 }

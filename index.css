@@ -1,0 +1,73 @@
+* {
+  box-sizing: border-box;
+}
+
+.wrapper {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  border: ridge 3px rgb(75, 67, 22);
+}
+
+#topBar {
+  position: absolute;
+  display: flex;
+  width: 100%;
+
+  border-bottom: 5px ridge rgb(175, 93, 15);
+
+  background-color: rgba(0, 0, 0, 0.219);
+  align-items: center;
+  padding: 3px;
+}
+
+#playerBar {
+  display: flex;
+  background-color: rgb(61, 61, 131);
+  align-items: center;
+  justify-content: flex-end;
+  height: 40px;
+  width: 100%;
+  border-radius: 15px 0 0 15px;
+  border-top: 0.5px solid gold;
+  border-bottom: 0.5px solid gold;
+}
+
+#timer {
+  background-color: rgb(175, 31, 31);
+  height: 70px;
+  width: 20%;
+  border-radius: 25% 5%;
+  border-top: 0.5px solid gold;
+  border-bottom: 0.5px solid gold;
+}
+
+#enemyBar {
+  display: flex;
+  background-color: rgb(61, 61, 131);
+  align-items: center;
+  height: 40px;
+  width: 100%;
+  border-radius: 0 15px 15px 0;
+  border-top: 0.5px solid gold;
+  border-bottom: 0.5px solid gold;
+}
+
+#playerHealth {
+  background-color: rgb(175, 31, 31);
+  width: 100%;
+  height: 15px;
+  float: right;
+  border-radius: 20px 0 0 20px;
+  margin-left: 2px;
+  box-shadow: 0 0 5px red, 0 0 2px blue;
+}
+
+#enemyHealth {
+  background-color: rgb(175, 31, 31);
+  width: 100%;
+  height: 15px;
+  border-radius: 0 20px 20px 0;
+  margin-right: 2px;
+  box-shadow: 0 0 5px red, 0 0 2px blue;
+}
