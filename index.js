@@ -194,12 +194,18 @@ function findSpriteMid(obj, axis) {
 
 function checkCollision({ attacker, target }) {
   return (
-    attacker.attackBox.position.x + attacker.attackBox.width >=
+    attacker.attackBox.position.x +
+      attacker.attackBox.width +
+      attacker.attackBox.offset.x >=
       target.position.x &&
-    attacker.attackBox.position.x <= target.position.x + target.width &&
-    attacker.attackBox.position.y + attacker.attackBox.height >=
+    attacker.attackBox.position.x + attacker.attackBox.offset.x <=
+      target.position.x + target.width &&
+    attacker.attackBox.position.y +
+      attacker.attackBox.height +
+      attacker.attackBox.offset.y >=
       target.position.y &&
-    attacker.attackBox.position.y <= target.position.y + target.height
+    attacker.attackBox.position.y + attacker.attackBox.offset.y <=
+      target.position.y + target.height
   );
 }
 function damage(attacker, target) {
