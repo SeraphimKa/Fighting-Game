@@ -37,6 +37,7 @@ class Sprite {
       offset,
     };
     this.isAttacking = false;
+    this.attackTime = false;
     this.damage = 5;
     this.cooldown = true;
     this.controls = controls;
@@ -58,7 +59,7 @@ class Sprite {
     ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
 
     //attack
-    if (this.isAttacking) {
+    if (this.attackTime) {
       ctx.fillStyle = "yellow";
       ctx.fillRect(
         this.attackBox.position.x + this.attackBox.offset.x,
@@ -113,9 +114,13 @@ class Sprite {
   }
   attack() {
     this.isAttacking = true;
+    this.attackTime = true;
     this.cooldown = false;
     setTimeout(() => {
       this.isAttacking = false;
+    }, 100);
+    setTimeout(() => {
+      this.attackTime = false;
     }, 100);
     setTimeout(() => {
       this.cooldown = true;
@@ -167,7 +172,7 @@ const player = new Sprite({
   velocity: { x: 0, y: 0 },
   isPlayer: true,
   color: "red",
-  offset: { x: 0, y: 0 },
+  offset: { x: 25, y: 0 },
   controls: p1Controls,
   name: "player",
 });
@@ -176,7 +181,7 @@ const enemy = new Sprite({
   position: { x: 800, y: 0 },
   velocity: { x: 0, y: 0 },
   color: "blue",
-  offset: { x: -25, y: 0 },
+  offset: { x: -50, y: 0 },
   controls: p2Controls,
   name: "enemy",
 });
