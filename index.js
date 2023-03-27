@@ -72,14 +72,19 @@ function timer(time) {
   time -= 1;
   document.querySelector("#timer").innerHTML = `${time}`;
   if (time > 0) {
-    timerID = setTimeout(() => timer(time), 100);
-  } else gameOver(timerID);
+    timerID = setTimeout(() => timer(time), 500);
+  } else gameOver({ timerID, player, enemy });
 }
 
-function gameOver(timerID) {
+function gameOver({ timerID, player, enemy }) {
   clearTimeout(timerID);
-  document.querySelector("#gameOver").innerHtml = "Game Over";
+  document.querySelector("#gameOver").innerHTML = "Game Over<br>";
   document.querySelector("#gameOver").style.display = "flex";
+  if (player.health > enemy.health) {
+    document.querySelector("#gameOver").innerHTML += "Player 1 Won";
+  } else if (player.health < enemy.health) {
+    document.querySelector("#gameOver").innerHTML += "Player 2 Won";
+  } else document.querySelector("#gameOver").innerHTML += "Tie";
 }
 
 player.setKeys();
@@ -113,6 +118,10 @@ function gameLoop() {
   ) {
     damage(enemy, player);
     enemy.isAttacking = false;
+  }
+
+  if (player.health <= 0 || enemy.health <= 0) {
+    gameOver({ timerID, player, enemy });
   }
 }
 
