@@ -9,6 +9,8 @@ canvas.height = 600;
 const grav = 0.4;
 const floorHeight = canvas.height * 0.95;
 const wallWidth = canvas.width * 0.05;
+let time = 100;
+let timerID;
 
 const background = new Sprite({
   position: { x: 0, y: -420 },
@@ -66,11 +68,26 @@ function damage(attacker, target) {
   ).style.width = `${target.health}%`;
 }
 
+function timer(time) {
+  time -= 1;
+  document.querySelector("#timer").innerHTML = `${time}`;
+  if (time > 0) {
+    timerID = setTimeout(() => timer(time), 100);
+  } else gameOver(timerID);
+}
+
+function gameOver(timerID) {
+  clearTimeout(timerID);
+  document.querySelector("#gameOver").innerHtml = "Game Over";
+  document.querySelector("#gameOver").style.display = "flex";
+}
+
 player.setKeys();
 enemy.setKeys();
+timer(time);
 //Animate Game Loop
-function animate() {
-  window.requestAnimationFrame(animate);
+function gameLoop() {
+  window.requestAnimationFrame(gameLoop);
   //background
   ctx.fillStyle = "green";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -99,4 +116,4 @@ function animate() {
   }
 }
 
-animate();
+gameLoop();
