@@ -124,9 +124,9 @@ class Fighter {
     }
   }
   attack() {
-    this.isAttacking = true;
-    this.attackTime = true;
-    this.cooldown = false;
+    this.isAttacking = true; //Gonna do damage
+    this.attackTime = true; //How long the attack plays out
+    this.cooldown = false; //Can't attack again until true
     setTimeout(() => {
       this.isAttacking = false;
     }, 100);
@@ -135,7 +135,7 @@ class Fighter {
     }, 100);
     setTimeout(() => {
       this.cooldown = true;
-    }, 1000);
+    }, 400);
   }
 
   setKeys() {
