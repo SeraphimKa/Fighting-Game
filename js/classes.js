@@ -1,42 +1,101 @@
 class Sprite {
-  constructor({ position, imageSrc, scale }) {
+  constructor({
+    position,
+    imgOffset = { x: 0, y: 0 },
+    imageSrc,
+    scale,
+    framesMax = { x: 1, y: 1 }, //Max frames in image - starts from 1
+    framesCurrent = { x: 0, y: 0 }, //Iterate through frames
+    framesEllapsed = 0, //Frames since start
+    framesHold = 1, //How many loops per frame
+    framesLimit = { start: 0, end: 0 }, //Which frames should be played
+  }) {
     this.position = position;
-    this.width = 50;
-    this.height = 150;
+    this.width;
+    this.height;
+    this.imgOffset = imgOffset;
     this.image = new Image();
     this.image.src = imageSrc;
     this.scale = scale;
+    this.framesMax = framesMax;
+    this.framesCurrent = framesCurrent;
+    this.framesEllapsed = framesEllapsed;
+    this.framesHold = framesHold;
+    this.framesLimit = framesLimit;
   }
   draw() {
     ctx.drawImage(
       this.image,
-      this.position.x,
-      this.position.y,
-      this.image.width * this.scale,
-      this.image.height * this.scale
+      this.framesCurrent.x * [this.image.width / this.framesMax.x], //crop size -->
+      this.framesCurrent.y * [this.image.width / this.framesMax.x],
+      this.image.width / this.framesMax.x,
+      this.image.height / this.framesMax.y, // <--
+      this.position.x - this.imgOffset.x, //image placement -->
+      this.position.y - this.imgOffset.y,
+      (this.image.width / this.framesMax.x) * this.scale,
+      (this.image.height / this.framesMax.y) * this.scale // <--
     );
   }
   update() {
     this.draw();
+    this.animateFrames();
+  }
+
+  animateFrames() {
+    this.framesEllapsed++;
+    if (this.framesEllapsed % this.framesHold == 0) {
+      if (
+        this.framesCurrent.x + 1 + this.framesCurrent.y * this.framesMax.x < // each +1 y = x row passed
+        this.framesLimit.end + 1
+      ) {
+        if (this.framesCurrent.x + 1 < this.framesMax.x) {
+          this.framesCurrent.x += 1;
+        } else {
+          this.framesCurrent.x = 0;
+          this.framesCurrent.y += 1;
+        }
+      } else {
+        this.framesCurrent.x = this.framesLimit.start % this.framesMax.x;
+        this.framesCurrent.y = Math.floor(
+          this.framesLimit.start / this.framesMax.x
+        );
+      }
+    }
   }
 }
 
-class Fighter {
+class Fighter extends Sprite {
   constructor({
     position,
     velocity,
     isPlayer = false,
-    color,
     movespeed = 2,
-    offset = { x: 0, y: 0 },
+    atkOffset = { x: 0, y: 0 },
+    imageSrc,
+    imgOffset = { x: 0, y: 0 },
+    scale,
     controls,
     name,
+    framesMax = { x: 1, y: 1 }, //Max frames in image - starts from 1
+    framesCurrent = { x: 0, y: 0 }, //Iterate through frames
+    framesEllapsed = 0, //Frames since start
+    framesHold = 1, //How many loops per frame
+    framesLimit = { start: 0, end: 0 },
   }) {
     //Passing object {a, b...} to the constructor so that we can pass any argument in any order
-    this.position = position;
+    super({
+      position,
+      imageSrc,
+      imgOffset,
+      scale,
+      framesMax,
+      framesCurrent,
+      framesEllapsed,
+      framesHold,
+      framesLimit,
+    });
     this.velocity = velocity;
     this.isPlayer = isPlayer;
-    this.color = color;
     this.movespeed = movespeed;
     this.width = 50;
     this.height = 150;
@@ -44,7 +103,7 @@ class Fighter {
       position: { x: this.position.x, y: this.position.y },
       width: 100,
       height: 50,
-      offset,
+      atkOffset,
     };
     this.isAttacking = false;
     this.attackTime = false;
@@ -63,25 +122,28 @@ class Fighter {
     this.name = name;
     this.health = 100;
   }
-  draw() {
-    //character
-    ctx.fillStyle = this.color;
-    ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
-  }
+  // draw() {
+  //   //character
+  //   ctx.fillStyle = this.color;
+  //   ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
+  // }
   //attack
   drawAttack() {
     if (this.attackTime) {
       ctx.fillStyle = "yellow";
       ctx.fillRect(
-        this.attackBox.position.x + this.attackBox.offset.x,
-        this.attackBox.position.y + this.attackBox.offset.y,
+        this.attackBox.position.x + this.attackBox.atkOffset.x,
+        this.attackBox.position.y + this.attackBox.atkOffset.y,
         this.attackBox.width,
         this.attackBox.height
       );
     }
   }
+
   update() {
     this.draw();
+    this.animateFrames();
+
     if (this.position.y + this.height < floorHeight) this.velocity.y += grav;
 
     this.control();
@@ -92,6 +154,7 @@ class Fighter {
       this.position.y = floorHeight - this.height;
     }
   }
+
   control() {
     this.velocity.x = 0;
     if (this.action.moveLeft.pressed && this.position.x > wallWidth) {
@@ -115,10 +178,10 @@ class Fighter {
     if (this.action.attack1.pressed && this.cooldown) {
       this.attack();
       this.attackBox.position = {
-        x: this.position.x + this.attackBox.offset.x,
+        x: this.position.x + this.attackBox.atkOffset.x,
         y:
           findSpriteMid(this, "y") +
-          this.attackBox.offset.y -
+          this.attackBox.atkOffset.y -
           this.attackBox.height / 2,
       };
     }

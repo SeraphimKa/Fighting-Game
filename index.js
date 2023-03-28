@@ -1,41 +1,42 @@
-const canvas = document.querySelector("canvas");
-ctx = canvas.getContext("2d");
-
-//Canvas
-canvas.width = 1000;
-canvas.height = 600;
-
-//Arena
-const grav = 0.4;
-const floorHeight = canvas.height * 0.95;
-const wallWidth = canvas.width * 0.05;
-let time = 100;
-let timerID;
-
 const background = new Sprite({
   position: { x: 0, y: -420 },
   imageSrc: "./images/background/Greek_style_background__16bit.png",
   scale: 1,
 });
-
+// const sprite = new Sprite({
+//   position: { x: 500, y: 300 },
+//   imageSrc: "./images/CharWalk.png",
+//   framesMax: { x: 3, y: 3 },
+//   scale: 3.5,
+//   framesHold: 60,
+//   framesLimit: { start: 2, end: 3 },
+// });
 //Initiate Player and Enemy objects
 const player = new Fighter({
-  position: { x: 200, y: 0 },
+  position: { x: 200, y: 2000 },
   velocity: { x: 0, y: 0 },
   isPlayer: true,
-  color: "red",
-  offset: { x: 25, y: 0 },
+  atkOffset: { x: 25, y: 0 },
   controls: p1Controls,
   name: "player",
+  imageSrc: "./images/CharWalk.png",
+  framesMax: { x: 3, y: 3 },
+  scale: 3.5,
+  framesHold: 60,
+  framesLimit: { start: 0, end: 1 },
 });
 
 const enemy = new Fighter({
   position: { x: 800, y: 0 },
   velocity: { x: 0, y: 0 },
-  color: "blue",
-  offset: { x: -50, y: 0 },
+  atkOffset: { x: -50, y: 0 },
   controls: p2Controls,
   name: "enemy",
+  imageSrc: "./images/CharWalk.png",
+  framesMax: { x: 3, y: 3 },
+  scale: 3.5,
+  framesHold: 60,
+  framesLimit: { start: 0, end: 1 },
 });
 
 function findSpriteMid(obj, axis) {
@@ -48,15 +49,15 @@ function checkCollision({ attacker, target }) {
   return (
     attacker.attackBox.position.x +
       attacker.attackBox.width +
-      attacker.attackBox.offset.x >=
+      attacker.attackBox.atkOffset.x >=
       target.position.x &&
-    attacker.attackBox.position.x + attacker.attackBox.offset.x <=
+    attacker.attackBox.position.x + attacker.attackBox.atkOffset.x <=
       target.position.x + target.width &&
     attacker.attackBox.position.y +
       attacker.attackBox.height +
-      attacker.attackBox.offset.y >=
+      attacker.attackBox.atkOffset.y >=
       target.position.y &&
-    attacker.attackBox.position.y + attacker.attackBox.offset.y <=
+    attacker.attackBox.position.y + attacker.attackBox.atkOffset.y <=
       target.position.y + target.height
   );
 }
@@ -68,6 +69,8 @@ function damage(attacker, target) {
   ).style.width = `${target.health}%`;
 }
 
+let time = 100;
+let timerID;
 function timer(time) {
   time -= 1;
   document.querySelector("#timer").innerHTML = `${time}`;
@@ -100,11 +103,12 @@ function gameLoop() {
   ctx.fillRect(0, floorHeight - 50, canvas.width, canvas.height);
   //input
   background.update();
+
   player.update();
+
   enemy.update();
   player.drawAttack();
   enemy.drawAttack();
-
   if (
     player.isAttacking &&
     checkCollision({ attacker: player, target: enemy })
