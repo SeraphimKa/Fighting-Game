@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Fighting Game</title>
     <link rel="shortcut icon" href="favicon/favicon.ico" />
     <link
       rel="stylesheet"
@@ -14,7 +14,17 @@
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
-    <div id="wrapper">
+    <main id="wrapper">
+      <!-- Menu -->
+      <div id="menu">
+        <ul>
+          <li id="start">Start</li>
+          <li id="options">Options</li>
+          <li id="credits">Credits</li>
+          <li id="quit">Quit</li>
+        </ul>
+      </div>
+
       <!-- Top Bar -->
       <div id="topBar">
         <!-- Player Health -->
@@ -32,7 +42,8 @@
       </div>
       <div id="gameOver"></div>
       <canvas></canvas>
-    </div>
+    </main>
+    <script src="js/menu.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/classes.js"></script>
     <script src="index.js"></script>

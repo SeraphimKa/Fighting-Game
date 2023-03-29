@@ -3,6 +3,7 @@ const background = new Sprite({
   imageSrc: "./images/background/Greek_style_background__16bit.png",
   scale: 1,
 });
+
 // const sprite = new Sprite({
 //   position: { x: 500, y: 300 },
 //   imageSrc: "./images/CharWalk.png",
@@ -11,6 +12,7 @@ const background = new Sprite({
 //   framesHold: 60,
 //   framesLimit: { start: 2, end: 3 },
 // });
+
 //Initiate Player and Enemy objects
 const player = new Fighter({
   position: { x: 200, y: 2000 },
@@ -69,13 +71,13 @@ function damage(attacker, target) {
   ).style.width = `${target.health}%`;
 }
 
-let time = 100;
+let time = 10000;
 let timerID;
 function timer(time) {
   time -= 1;
   document.querySelector("#timer").innerHTML = `${time}`;
   if (time > 0) {
-    timerID = setTimeout(() => timer(time), 500);
+    timerID = setTimeout(() => timer(time), 1000);
   } else gameOver({ timerID, player, enemy });
 }
 
@@ -90,12 +92,16 @@ function gameOver({ timerID, player, enemy }) {
   } else document.querySelector("#gameOver").innerHTML += "Tie";
 }
 
+menuInit();
+
 player.setKeys();
 enemy.setKeys();
 timer(time);
 //Animate Game Loop
 function gameLoop() {
-  window.requestAnimationFrame(gameLoop);
+  if (player.health > 0 && enemy.health > 0)
+    window.requestAnimationFrame(gameLoop);
+  else menuInit();
   //background
   ctx.fillStyle = "green";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -128,5 +134,3 @@ function gameLoop() {
     gameOver({ timerID, player, enemy });
   }
 }
-
-gameLoop();
