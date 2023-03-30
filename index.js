@@ -73,13 +73,10 @@ function hpUpdate(target) {
   ).style.width = `${target.health}%`;
 }
 
-let timerID;
 function timer(time) {
   time -= 1;
   document.querySelector("#timer").innerHTML = `${time}`;
-  if (time > 0) {
-    timerID = setTimeout(() => timer(time), 1000);
-  } else gameOver({ timerID, player, enemy });
+  if (time > 0) timerID = setTimeout(() => timer(time), 1000);
 }
 
 function gameInit() {
@@ -89,12 +86,13 @@ function gameInit() {
   hpUpdate(enemy);
   player.position = { x: 200, y: 2000 };
   enemy.position = { x: 800, y: 2000 };
-  let time = 100;
   timer(time);
   gameLoop();
 }
 
-function menuInit(gameInit) {
+function menuInit() {
+  ctx.fillStyle = "black";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
   document.querySelector("#gameOver").style.display = "none";
   document.querySelector("#menu").style.display = "flex";
 
@@ -112,15 +110,12 @@ function gameOver({ timerID, player, enemy }) {
   } else if (player.health < enemy.health) {
     document.querySelector("#gameOver").innerHTML += "Player 2 Won";
   } else document.querySelector("#gameOver").innerHTML += "Tie";
-  setInterval(menuInit(gameInit), 10000);
+  setTimeout(menuInit, 4000);
 }
-
-ctx.fillStyle = "black";
-ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 //Animate Game Loop
 function gameLoop() {
-  if (player.health > 0 && enemy.health > 0) {
+  if (player.health > 0 && enemy.health > 0 && time > 0) {
     window.requestAnimationFrame(gameLoop);
 
     //background
@@ -153,9 +148,11 @@ function gameLoop() {
 
 player.setKeys();
 enemy.setKeys();
+let time = 100;
+let timerID;
+menuInit();
 
 document.querySelector("#start").addEventListener("click", (event) => {
   document.querySelector("#menu").style.display = "none";
   gameInit();
 });
-menuInit(gameInit);
