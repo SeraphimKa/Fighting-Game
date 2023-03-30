@@ -29,7 +29,7 @@ const player = new Fighter({
 });
 
 const enemy = new Fighter({
-  position: { x: 800, y: 0 },
+  position: { x: 800, y: 2000 },
   velocity: { x: 0, y: 0 },
   atkOffset: { x: -50, y: 0 },
   controls: p2Controls,
@@ -71,7 +71,6 @@ function damage(attacker, target) {
   ).style.width = `${target.health}%`;
 }
 
-let time = 10000;
 let timerID;
 function timer(time) {
   time -= 1;
@@ -81,56 +80,54 @@ function timer(time) {
   } else gameOver({ timerID, player, enemy });
 }
 
-function gameOver({ timerID, player, enemy }) {
-  clearTimeout(timerID);
-  document.querySelector("#gameOver").innerHTML = "Game Over<br>";
-  document.querySelector("#gameOver").style.display = "flex";
-  if (player.health > enemy.health) {
-    document.querySelector("#gameOver").innerHTML += "Player 1 Won";
-  } else if (player.health < enemy.health) {
-    document.querySelector("#gameOver").innerHTML += "Player 2 Won";
-  } else document.querySelector("#gameOver").innerHTML += "Tie";
+function gameInit() {
+  player.health = 100;
+  enemy.health = 100;
+  let time = 100;
+  timer(time);
+  gameLoop();
 }
 
-menuInit();
+ctx.fillStyle = "black";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-player.setKeys();
-enemy.setKeys();
-timer(time);
 //Animate Game Loop
 function gameLoop() {
-  if (player.health > 0 && enemy.health > 0)
+  if (player.health > 0 && enemy.health > 0) {
     window.requestAnimationFrame(gameLoop);
-  else menuInit();
-  //background
-  ctx.fillStyle = "green";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "brown";
-  ctx.fillRect(0, floorHeight - 50, canvas.width, canvas.height);
-  //input
-  background.update();
 
-  player.update();
+    //background
+    ctx.fillStyle = "green";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "brown";
+    ctx.fillRect(0, floorHeight - 50, canvas.width, canvas.height);
+    //input
+    background.update();
+    player.update();
+    enemy.update();
+    player.drawAttack();
+    enemy.drawAttack();
+    if (
+      player.isAttacking &&
+      checkCollision({ attacker: player, target: enemy })
+    ) {
+      damage(player, enemy);
+      player.isAttacking = false;
+    }
+    if (
+      enemy.isAttacking &&
+      checkCollision({ attacker: enemy, target: player })
+    ) {
+      damage(enemy, player);
+      enemy.isAttacking = false;
+    }
 
-  enemy.update();
-  player.drawAttack();
-  enemy.drawAttack();
-  if (
-    player.isAttacking &&
-    checkCollision({ attacker: player, target: enemy })
-  ) {
-    damage(player, enemy);
-    player.isAttacking = false;
+    if (player.health <= 0 || enemy.health <= 0) {
+      gameOver({ timerID, player, enemy });
+    }
   }
-  if (
-    enemy.isAttacking &&
-    checkCollision({ attacker: enemy, target: player })
-  ) {
-    damage(enemy, player);
-    enemy.isAttacking = false;
-  }
-
-  if (player.health <= 0 || enemy.health <= 0) {
-    gameOver({ timerID, player, enemy });
-  }
+  console.log("end");
 }
+player.setKeys();
+enemy.setKeys();
+menuInit(gameInit);
