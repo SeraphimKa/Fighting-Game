@@ -65,7 +65,9 @@ function checkCollision({ attacker, target }) {
 }
 function damage(attacker, target) {
   target.health -= attacker.damage;
-
+  this.hpUpdate(target);
+}
+function hpUpdate(target) {
   document.querySelector(
     `#${target.name}Health`
   ).style.width = `${target.health}%`;
@@ -83,9 +85,34 @@ function timer(time) {
 function gameInit() {
   player.health = 100;
   enemy.health = 100;
+  hpUpdate(player);
+  hpUpdate(enemy);
+  player.position = { x: 200, y: 2000 };
+  enemy.position = { x: 800, y: 2000 };
   let time = 100;
   timer(time);
   gameLoop();
+}
+
+function menuInit(gameInit) {
+  document.querySelector("#gameOver").style.display = "none";
+  document.querySelector("#menu").style.display = "flex";
+
+  //   document.querySelector("#options").addEventListener("click", (event) => {});
+  //   document.querySelector("#credits").addEventListener("click", (event) => {});
+  //   document.querySelector("#quit").addEventListener("click", (event) => {});
+}
+
+function gameOver({ timerID, player, enemy }) {
+  clearTimeout(timerID);
+  document.querySelector("#gameOver").innerHTML = "Game Over<br>";
+  document.querySelector("#gameOver").style.display = "flex";
+  if (player.health > enemy.health) {
+    document.querySelector("#gameOver").innerHTML += "Player 1 Won";
+  } else if (player.health < enemy.health) {
+    document.querySelector("#gameOver").innerHTML += "Player 2 Won";
+  } else document.querySelector("#gameOver").innerHTML += "Tie";
+  setInterval(menuInit(gameInit), 10000);
 }
 
 ctx.fillStyle = "black";
@@ -121,13 +148,14 @@ function gameLoop() {
       damage(enemy, player);
       enemy.isAttacking = false;
     }
-
-    if (player.health <= 0 || enemy.health <= 0) {
-      gameOver({ timerID, player, enemy });
-    }
-  }
-  console.log("end");
+  } else gameOver({ timerID, player, enemy });
 }
+
 player.setKeys();
 enemy.setKeys();
+
+document.querySelector("#start").addEventListener("click", (event) => {
+  document.querySelector("#menu").style.display = "none";
+  gameInit();
+});
 menuInit(gameInit);
