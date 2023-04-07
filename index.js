@@ -4,15 +4,6 @@ const background = new Sprite({
   scale: 1,
 });
 
-// const sprite = new Sprite({
-//   position: { x: 500, y: 300 },
-//   imageSrc: "./images/CharWalk.png",
-//   framesMax: { x: 3, y: 3 },
-//   scale: 3.5,
-//   framesHold: 60,
-//   framesLimit: { start: 2, end: 3 },
-// });
-
 //Initiate Player and Enemy objects
 const player = new Fighter({
   position: { x: 200, y: 2000 },
@@ -21,7 +12,7 @@ const player = new Fighter({
   atkOffset: { x: 25, y: 0 },
   controls: p1Controls,
   name: "player",
-  imageSrc: "./images/CharWalk.png",
+  imageSrc: "./images/Char1.png",
   framesMax: { x: 3, y: 3 },
   scale: 3.5,
   framesHold: 60,
@@ -34,7 +25,7 @@ const enemy = new Fighter({
   atkOffset: { x: -50, y: 0 },
   controls: p2Controls,
   name: "enemy",
-  imageSrc: "./images/CharWalk.png",
+  imageSrc: "./images/Char1rev.png",
   framesMax: { x: 3, y: 3 },
   scale: 3.5,
   framesHold: 60,
